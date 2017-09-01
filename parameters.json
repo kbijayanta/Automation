@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appService_EPSInspections_name": {
+            "value": "EPSInspections"
+        },
+        "appServicePlan_EPSInspectionsPlan_location": {
+            "value": "South Central US"
+        },
+        "appServicePlan_EPSInspectionsPlan_name": {
+            "value": "EPSInspectionsPlan"
+        },
+        "appServicePlan_EPSInspectionsPlan_resourceGroup": {
+            "value": "EPSApp"
+        },
+        "appServicePlan_EPSInspectionsPlan_skuName": {
+            "value": "S1"
+        },
+        "appServicePlan_EPSInspectionsPlan_skuTier": {
+            "value": "Standard"
+        },
+        "appServicePlan_EPSInspectionsPlan_skuFamily": {
+            "value": "S1"
+        },
+        "appServicePlan_EPSInspectionsPlan_skuSize": {
+            "value": "S"
+        },
+        "appServicePlan_EPSInspectionsPlan_workerSizeId": {
+            "value": 0
+        },
+        "dbserver_epsinspectionsdbserver_name": {
+            "value": "epsinspectionsdbserver"
+        },
+        "dbserver_epsinspectionsdbserver_adminlogin": {
+            "value": "kbijayanta"
+        },
+        "dbserver_epsinspectionsdbserver_adminpassword": {
+            "value": "microsoft@123"
+        },
+        "dbserver_epsinspectionsdbserver_location": {
+            "value": "South Central US"
+        },
+        "dbserver_epsinspectionsdbserver_EPSInspections_db_name": {
+            "value": "EPSInspections_db"
+        },
+        "dbserver_epsinspectionsdbserver_EPSInspections_db_location": {
+            "value": "South Central US"
+        }
+    }
+}

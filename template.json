@@ -1,0 +1,141 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appService_EPSInspections_name": {
+            "type": "String"
+        },
+        "appServicePlan_EPSInspectionsPlan_location": {
+            "type": "String"
+        },
+        "appServicePlan_EPSInspectionsPlan_name": {
+            "type": "String"
+        },
+        "appServicePlan_EPSInspectionsPlan_resourceGroup": {
+            "type": "String"
+        },
+        "appServicePlan_EPSInspectionsPlan_skuName": {
+            "type": "String"
+        },
+        "appServicePlan_EPSInspectionsPlan_skuTier": {
+            "type": "String"
+        },
+        "appServicePlan_EPSInspectionsPlan_skuFamily": {
+            "type": "String"
+        },
+        "appServicePlan_EPSInspectionsPlan_skuSize": {
+            "type": "String"
+        },
+        "appServicePlan_EPSInspectionsPlan_workerSizeId": {
+            "type": "Int"
+        },
+        "dbserver_epsinspectionsdbserver_name": {
+            "type": "String"
+        },
+        "dbserver_epsinspectionsdbserver_adminlogin": {
+            "type": "String"
+        },
+        "dbserver_epsinspectionsdbserver_adminpassword": {
+            "type": "SecureString"
+        },
+        "dbserver_epsinspectionsdbserver_location": {
+            "type": "String"
+        },
+        "dbserver_epsinspectionsdbserver_EPSInspections_db_name": {
+            "type": "String"
+        },
+        "dbserver_epsinspectionsdbserver_EPSInspections_db_location": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites",
+            "kind": "WebApp",
+            "name": "[parameters('appService_EPSInspections_name')]",
+            "apiVersion": "2015-08-01",
+            "location": "[parameters('appServicePlan_EPSInspectionsPlan_location')]",
+            "tags": {
+                "[concat('hidden-related:', resourceId(parameters('appServicePlan_EPSInspectionsPlan_resourceGroup'),'Microsoft.Web/serverfarms', parameters('appServicePlan_EPSInspectionsPlan_name')))]": "empty"
+            },
+            "properties": {
+                "name": "[parameters('appService_EPSInspections_name')]",
+                "serverFarmId": "[resourceId(parameters('appServicePlan_EPSInspectionsPlan_resourceGroup'),'Microsoft.Web/serverfarms', parameters('appServicePlan_EPSInspectionsPlan_name'))]",
+                "kind": "WebApp"
+            },
+            "resources": [
+                {
+                    "type": "config",
+                    "name": "connectionstrings",
+                    "apiVersion": "2015-08-01",
+                    "properties": {
+                        "DefaultConnection": {
+                            "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('dbserver_epsinspectionsdbserver_name'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('dbserver_epsinspectionsdbserver_EPSInspections_db_name'), ';User Id=', parameters('dbserver_epsinspectionsdbserver_adminlogin'), '@', parameters('dbserver_epsinspectionsdbserver_name'), ';Password=', parameters('dbserver_epsinspectionsdbserver_adminpassword'))]",
+                            "type": 2
+                        }
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Web/Sites/', parameters('appService_EPSInspections_name'))]"
+                    ]
+                }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverFarms', parameters('appServicePlan_EPSInspectionsPlan_name'))]",
+                "[concat('Microsoft.Sql/servers/', parameters('dbserver_epsinspectionsdbserver_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "[parameters('appServicePlan_EPSInspectionsPlan_skuName')]",
+                "tier": "[parameters('appServicePlan_EPSInspectionsPlan_skuTier')]",
+                "family": "[parameters('appServicePlan_EPSInspectionsPlan_skuFamily')]",
+                "size": "[parameters('appServicePlan_EPSInspectionsPlan_skuSize')]"
+            },
+            "name": "[parameters('appServicePlan_EPSInspectionsPlan_name')]",
+            "apiVersion": "2015-08-01",
+            "location": "[parameters('appServicePlan_EPSInspectionsPlan_location')]",
+            "properties": {
+                "name": "[parameters('appServicePlan_EPSInspectionsPlan_name')]"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers",
+            "name": "[parameters('dbserver_epsinspectionsdbserver_name')]",
+            "apiVersion": "2014-04-01-preview",
+            "location": "[parameters('dbserver_epsinspectionsdbserver_location')]",
+            "properties": {
+                "administratorLogin": "[parameters('dbserver_epsinspectionsdbserver_adminlogin')]",
+                "administratorLoginPassword": "[parameters('dbserver_epsinspectionsdbserver_adminpassword')]"
+            },
+            "resources": [
+                {
+                    "type": "firewallrules",
+                    "name": "AllowAllAzureIPs",
+                    "apiVersion": "2014-04-01",
+                    "location": "[parameters('dbserver_epsinspectionsdbserver_location')]",
+                    "properties": {
+                        "endIpAddress": "0.0.0.0",
+                        "startIpAddress": "0.0.0.0"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('dbserver_epsinspectionsdbserver_name'))]"
+                    ]
+                },
+                {
+                    "type": "databases",
+                    "name": "[parameters('dbserver_epsinspectionsdbserver_EPSInspections_db_name')]",
+                    "apiVersion": "2014-04-01-preview",
+                    "location": "[parameters('dbserver_epsinspectionsdbserver_EPSInspections_db_location')]",
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS",
+                        "maxSizeBytes": "1073741824"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('dbserver_epsinspectionsdbserver_name'))]"
+                    ]
+                }
+            ]
+        }
+    ]
+}
